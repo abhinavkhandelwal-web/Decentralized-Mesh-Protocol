@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 // Set to 1 to enable ESP32 light-sleep power management.
 // Set to 0 to disable it.
 #ifndef ENABLE_MESH_POWER_SAVE
