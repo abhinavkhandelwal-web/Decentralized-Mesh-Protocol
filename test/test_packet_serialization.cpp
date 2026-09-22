@@ -96,11 +96,17 @@ void test_packet_serialization_and_deserialization()
         original.header.payload_len
     );
 
-    // Verify CRC
-    TEST_ASSERT_EQUAL(
-        original.crc16,
-        restored.crc16
+ // Verify CRC
+uint16_t expected_crc =
+    calculate_crc16(
+        buffer,
+        serialized_length - sizeof(uint16_t)
     );
+
+TEST_ASSERT_EQUAL(
+    expected_crc,
+    restored.crc16
+);
 }
 
 void setUp()
