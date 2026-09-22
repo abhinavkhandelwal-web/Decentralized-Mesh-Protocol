@@ -106,7 +106,7 @@ void MeshNode::power_save_check(uint32_t current_time_ms)
 
     if (idle_time > 500)
     {
-        MeshPowerManager::sleep_if_idle();
+        MeshPowerManager::sleep_if_idle(idle_time);
     }
 }
 
