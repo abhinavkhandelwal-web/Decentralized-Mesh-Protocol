@@ -37,12 +37,17 @@ namespace MeshPowerManager
             return;
         }
 
-        uint32_t sleep_ms = MESH_BEACON_INTERVAL_MS - elapsed;
+        uint32_t sleep_ms = MESH_BEACON_INTERVAL_MS;
 
-        if (sleep_ms < MESH_MIN_SLEEP_MS)
-        {
-            return;
-        }
+if (elapsed < MESH_BEACON_INTERVAL_MS)
+{
+    sleep_ms = MESH_BEACON_INTERVAL_MS - elapsed;
+}
+
+if (sleep_ms < MESH_MIN_SLEEP_MS)
+{
+    sleep_ms = MESH_MIN_SLEEP_MS;
+}
 
         esp_sleep_enable_timer_wakeup(
             static_cast<uint64_t>(sleep_ms) * 1000ULL
