@@ -6,8 +6,18 @@
 MeshNode::MeshNode(uint16_t id) : node_id(id), current_seq(0) {}
 
 void MeshNode::init() {
+
     routing_table.clear();
+
     seen_packets.clear();
+
+#ifdef ARDUINO
+    // Set the SD card CS pin according to the ESP32 hardware wiring.
+    // The logger remains disabled if initialization fails.
+    constexpr uint8_t SD_CS_PIN = 5;
+    sd_logger_init(SD_CS_PIN);
+#endif
+
 }
 
 bool MeshNode::is_duplicate(uint16_t seq) {
