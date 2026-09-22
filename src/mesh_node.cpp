@@ -1,4 +1,5 @@
 #include "mesh_node.h"
+#include "sd_logger.h"
 #include <cstring>
 #include <algorithm>
 
@@ -39,10 +40,19 @@ void MeshNode::handle_received_packet(const uint8_t* raw_data, size_t len, int8_
     if (is_duplicate(packet.header.sequence_num)) {
         return;
     }
+update_peer(packet.header.sender_id, rssi, packet.header.ttl, current_time_ms);
 
-    update_peer(packet.header.sender_id, rssi, packet.header.ttl, current_time_ms);
+// Log every valid, non-duplicate packet received by the mesh node.
+sd_logger_log_packet(
+    current_time_ms,
+    packet.header.sender_id,
+    packet.header.receiver_id,
+    rssi,
+    packet.header.payload_len,
+    true
+);
 
-    if (packet.header.receiver_id == node_id || packet.header.receiver_id == 0xFFFF) {
+if (packet.header.receiver_id == node_id || packet.header.receiver_id == 0xFFFF) {
         // Core payload processing hook for swarm intelligence
     } else if (packet.header.ttl > 1) {
         // Dynamic multi-hop mesh forwarding (decrement TTL and relay)
