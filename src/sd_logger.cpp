@@ -1,5 +1,7 @@
 #include "sd_logger.h"
 
+#ifdef ARDUINO
+
 #include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
@@ -28,7 +30,6 @@ void create_log_file_if_needed() {
         return;
     }
 
-    // If the file exists but is empty, add the CSV header.
     File file = SD.open(LOG_FILE, FILE_APPEND);
 
     if (!file) {
@@ -135,3 +136,29 @@ void sd_logger_flush() {
 
     write_count = 0;
 }
+
+#else
+
+// Host/simulator stubs.
+// The actual SD-card implementation is compiled for Arduino/ESP32.
+
+bool sd_logger_init(uint8_t) {
+    return false;
+}
+
+
+void sd_logger_log_packet(
+    uint32_t,
+    uint32_t,
+    uint32_t,
+    int8_t,
+    size_t,
+    bool
+) {
+}
+
+
+void sd_logger_flush() {
+}
+
+#endif
