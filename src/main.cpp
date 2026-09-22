@@ -5,6 +5,7 @@
 #include "security_engine.h"
 #include "packet_format.h"
 #include "mesh_node.h"
+#include "power_manager.h"
 
 void print_hex(const char* label, const uint8_t* data, size_t len) {
     std::cout << label << ": ";
@@ -20,8 +21,10 @@ int main() {
     std::cout << "==================================================" << std::endl;
 
     // 1. Mesh Node Initialization
-    MeshNode local_node(0x1001);
-    local_node.init();
+  MeshNode local_node(0x1001);
+local_node.init();
+
+MeshPowerManager::init();
     std::cout << "[SYSTEM] Node 0x1001 initialized successfully." << std::endl;
 
     // 2. Swarm Orchestrator Initialization
