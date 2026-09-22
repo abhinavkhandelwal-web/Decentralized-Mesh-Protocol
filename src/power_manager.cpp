@@ -1,4 +1,5 @@
 #include "power_config.h"
+#include "power_manager.h"
 
 #ifdef ARDUINO
 
@@ -9,6 +10,9 @@ namespace MeshPowerManager
 {
     static uint32_t last_activity_ms = 0;
     static bool initialized = false;
+
+    static RadioPowerHook radio_suspend_hook = nullptr;
+    static RadioPowerHook radio_resume_hook = nullptr;
 
     void init()
     {
@@ -21,43 +25,62 @@ namespace MeshPowerManager
         last_activity_ms = millis();
     }
 
-    void sleep_if_idle()
+    void set_radio_hooks(
+        RadioPowerHook suspend_hook,
+        RadioPowerHook resume_hook
+    )
+    {
+        radio_suspend_hook = suspend_hook;
+        radio_resume_hook = resume_hook;
+    }
+
+    void sleep_if_idle(uint32_t idle_time_ms)
     {
 #if ENABLE_MESH_POWER_SAVE
+
         if (!initialized)
         {
             return;
         }
 
-        uint32_t now = millis();
-        uint32_t elapsed = now - last_activity_ms;
-
-        if (elapsed < MESH_MIN_SLEEP_MS)
+        if (idle_time_ms <= MESH_MIN_SLEEP_MS)
         {
             return;
         }
 
         uint32_t sleep_ms = MESH_BEACON_INTERVAL_MS;
 
-if (elapsed < MESH_BEACON_INTERVAL_MS)
-{
-    sleep_ms = MESH_BEACON_INTERVAL_MS - elapsed;
-}
+        if (idle_time_ms < MESH_BEACON_INTERVAL_MS)
+        {
+            sleep_ms =
+                MESH_BEACON_INTERVAL_MS - idle_time_ms;
+        }
 
-if (sleep_ms < MESH_MIN_SLEEP_MS)
-{
-    sleep_ms = MESH_MIN_SLEEP_MS;
-}
+        if (sleep_ms < MESH_MIN_SLEEP_MS)
+        {
+            sleep_ms = MESH_MIN_SLEEP_MS;
+        }
+
+        // Safely suspend the radio before entering light sleep.
+        if (radio_suspend_hook)
+        {
+            radio_suspend_hook();
+        }
 
         esp_sleep_enable_timer_wakeup(
             static_cast<uint64_t>(sleep_ms) * 1000ULL
         );
 
-     // ESP32 radio peripherals are automatically resumed after wake.
-// Give the platform a chance to restore normal execution.
-esp_light_sleep_start();
+        esp_light_sleep_start();
 
-last_activity_ms = millis();
+        // Reinitialize the radio after waking up.
+        if (radio_resume_hook)
+        {
+            radio_resume_hook();
+        }
+
+        last_activity_ms = millis();
+
 #endif
     }
 }
@@ -74,7 +97,14 @@ namespace MeshPowerManager
     {
     }
 
-    void sleep_if_idle()
+    void set_radio_hooks(
+        RadioPowerHook,
+        RadioPowerHook
+    )
+    {
+    }
+
+    void sleep_if_idle(uint32_t)
     {
     }
 }
