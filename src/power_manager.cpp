@@ -53,9 +53,11 @@ if (sleep_ms < MESH_MIN_SLEEP_MS)
             static_cast<uint64_t>(sleep_ms) * 1000ULL
         );
 
-        esp_light_sleep_start();
+     // ESP32 radio peripherals are automatically resumed after wake.
+// Give the platform a chance to restore normal execution.
+esp_light_sleep_start();
 
-        last_activity_ms = millis();
+last_activity_ms = millis();
 #endif
     }
 }
