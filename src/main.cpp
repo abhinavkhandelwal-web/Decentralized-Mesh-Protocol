@@ -5,6 +5,7 @@
 #include "security_engine.h"
 #include "packet_format.h"
 #include "mesh_node.h"
+#include "nvs_config.h"
 
 void print_hex(const char* label, const uint8_t* data, size_t len) {
     std::cout << label << ": ";
@@ -20,6 +21,23 @@ int main() {
     std::cout << "==================================================" << std::endl;
 
     // 1. Mesh Node Initialization
+    NVSConfig::begin();
+
+uint16_t stored_node_id = 0x1001;
+
+if (NVSConfig::load_node_id(stored_node_id))
+{
+    std::cout << "[NVS] Loaded node ID from flash: 0x"
+              << std::hex << stored_node_id
+              << std::dec << std::endl;
+}
+else
+{
+    NVSConfig::save_node_id(stored_node_id);
+
+    std::cout << "[NVS] Saved default node ID to flash."
+              << std::endl;
+}
     MeshNode local_node(0x1001);
     local_node.init();
     std::cout << "[SYSTEM] Node 0x1001 initialized successfully." << std::endl;
