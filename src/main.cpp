@@ -21,9 +21,12 @@ int main() {
     std::cout << "==================================================" << std::endl;
 
     // 1. Mesh Node Initialization
-    MeshNode local_node(0x1001);
-    local_node.init();
-    std::cout << "[SYSTEM] Node 0x1001 initialized successfully." << std::endl;
+   MeshNode local_node(0x1001);
+local_node.init();
+
+BatteryMonitor::check_battery(local_node);
+
+std::cout << "[SYSTEM] Node 0x1001 initialized successfully." << std::endl;
 
     // 2. Swarm Orchestrator Initialization
     SwarmOrchestrator orchestrator(0x1001);
