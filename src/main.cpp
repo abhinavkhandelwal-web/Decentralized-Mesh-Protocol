@@ -5,6 +5,7 @@
 #include "security_engine.h"
 #include "packet_format.h"
 #include "mesh_node.h"
+#include "battery_monitor.h"
 
 void print_hex(const char* label, const uint8_t* data, size_t len) {
     std::cout << label << ": ";
