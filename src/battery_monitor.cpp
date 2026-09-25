@@ -1,4 +1,4 @@
-#include "mesh_node.h"
+#include "battery_monitor.h"
 
 #include <cstdint>
 
@@ -17,9 +17,7 @@ namespace BatteryMonitor
     constexpr uint8_t ADC_SAMPLE_COUNT = 8;
     constexpr uint16_t ADC_MAX_VALUE = 4095;
 
-    // Reserved packet type for the battery-low emergency message.
-    constexpr PacketType STATUS_BATTERY_LOW =
-        static_cast<PacketType>(0x07);
+  
 
     static bool low_power_flag = false;
     static bool warning_sent = false;
@@ -57,7 +55,7 @@ namespace BatteryMonitor
                 "STATUS_BATTERY_LOW";
 
             mesh_node.broadcast_payload(
-                STATUS_BATTERY_LOW,
+                PacketType::STATUS_BATTERY_LOW,
                 reinterpret_cast<const uint8_t*>(
                     warning_message
                 ),
